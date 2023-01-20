@@ -13,6 +13,7 @@ const Content = () => {
     const [video, setVideo] = useState(undefined);
     const [room, setRoom] = useState(undefined);
     const [isConnected, setIsConnected] = useState(false);
+
     let syncEventId = undefined;
 
     // const videoPlayEventListener = () => {
@@ -62,6 +63,8 @@ const Content = () => {
     }
 
     useEffect(() => {
+        console.log('loading content');
+
         const fetchProfileData = async () => {
             let data = await getProfile();
             if (data['user'] !== undefined && data['room'] !== undefined) {
@@ -107,7 +110,7 @@ const Content = () => {
 
             const intervalUpdateState = setInterval(() => {
                 socket.emit('update-user-info', { currentProgress: video.currentTime });
-            }, 100);
+            }, 200);
 
             return () => {
                 removeVideoListener();
@@ -131,7 +134,7 @@ const Content = () => {
                         justifyContent: 'flex-start',
                         flexDirection: 'column'
                     }}>
-                    <div style={{ display: 'flex', justifyContent: 'flex-start', gap: '8px', paddingBottom: '12px', fontSize: '16px' }}>
+                    <div style={{ display: 'flex', justifyContent: 'flex-start', gap: '8px', paddingBottom: '6px', fontSize: '16px' }}>
                         <div>房间号: {room}</div>
                     </div>
 
@@ -169,7 +172,7 @@ const RoomPanel = ({ socket }) => {
     const stateToColor = (state) => {
         if (state == 'playing' || state == 'play') return 'green';
         if (state == 'pause') return 'orange';
-        if (state == 'waiting') return 'white';
+        if (state == 'waiting' || state == 'init') return 'white';
         if (state == 'close') return 'red';
         return 'red';
     }

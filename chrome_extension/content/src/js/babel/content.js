@@ -77,6 +77,7 @@ const Content = () => {
     });
   };
   useEffect(() => {
+    console.log('loading content');
     const fetchProfileData = async () => {
       let data = await getProfile();
       if (data['user'] !== undefined && data['room'] !== undefined) {
@@ -122,7 +123,7 @@ const Content = () => {
         socket.emit('update-user-info', {
           currentProgress: video.currentTime
         });
-      }, 100);
+      }, 200);
       return () => {
         removeVideoListener();
         clearInterval(intervalUpdateState);
@@ -156,7 +157,7 @@ const Content = () => {
       display: 'flex',
       justifyContent: 'flex-start',
       gap: '8px',
-      paddingBottom: '12px',
+      paddingBottom: '6px',
       fontSize: '16px'
     }
   }, /*#__PURE__*/React.createElement("div", null, "\u623F\u95F4\u53F7: ", room)), /*#__PURE__*/React.createElement(RoomPanel, {
@@ -191,7 +192,7 @@ const RoomPanel = ({
   const stateToColor = state => {
     if (state == 'playing' || state == 'play') return 'green';
     if (state == 'pause') return 'orange';
-    if (state == 'waiting') return 'white';
+    if (state == 'waiting' || state == 'init') return 'white';
     if (state == 'close') return 'red';
     return 'red';
   };
