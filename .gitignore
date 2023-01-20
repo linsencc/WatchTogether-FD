@@ -1,0 +1,8 @@
+flask_backend/venv
+.idea
+*.pyc
+flask_backend/data.db
+venv
+react_test_fd
+node_modules/
+build/
