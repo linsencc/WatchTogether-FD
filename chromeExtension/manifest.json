@@ -1,0 +1,44 @@
+{
+  "name": "WatchTogether",
+  "description": "异地看片小助手，允许多个PC设备同步视频播放进度",
+  "version": "1.0",
+  "manifest_version": 3,
+  "permissions": [
+    "activeTab",
+    "scripting",
+    "cookies"
+  ],
+  "host_permissions": [
+    "https://127.0.0.1:5000/",
+    "https://119.91.150.116:5000/"
+  ],
+  "action": {
+    "default_popup": "popup/Build/index.html",
+    "default_icon": {
+      "16": "/static/images/live-16.png",
+      "32": "/static/images/live-32.png",
+      "48": "/static/images/live-48.png",
+      "128": "/static/images/live-128.png"
+    }
+  },
+  "icons": {
+    "16": "/static/images/live-16.png",
+    "32": "/static/images/live-32.png",
+    "48": "/static/images/live-48.png",
+    "128": "/static/images/live-128.png"
+  },
+  "content_scripts": [
+    {
+      "matches": [
+        "https://*.bilibili.com/*",
+        "https://*.youtube.com/*",
+        "https://*.iqiyi.com/*",
+        "https://*.acfun.cn/*",
+        "https://*.youku.com/*"
+      ],
+      "js": [
+        "content/src/js/webpack/index.js"
+      ]
+    }
+  ]
+}

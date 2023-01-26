@@ -1,0 +1,20 @@
+.app {
+  width: auto;
+  /* height: 100vh;  */
+  /* height: 100vh; 部署时要去掉 */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.content {
+  width: 300px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 18px 20px 12px 20px;
+}
+
+.semi-form-field-label-text::after{
+  display: none;
+}

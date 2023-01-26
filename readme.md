@@ -16,9 +16,14 @@
 - 当前页面的视频是否处于播放就绪状态
 
 
-python
-直接run 和  pycharm 点击run
 
 
+
+
+
+生成 Chrome Extension content.js
+1. 进入WatchTogether-FD/content目录下，命令行执行下面命令，使用babel监听文件夹，进行react转码；
 //  npx babel --watch src/js/original --out-dir src/js/babel --presets @babel/preset-react
+
+2. 同样在WatchTogether-FD/content目录下，命令行执行下面命令，使用webpack监听文件夹进行打包；
 //  npx webpack --mode development
