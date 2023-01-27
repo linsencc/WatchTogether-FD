@@ -1,5 +1,5 @@
 const verifyEmail = (input: string) => {
-    if(input === '' || input === undefined || input === null){
+    if (input === '' || input === undefined || input === null) {
         return false;
     }
 
@@ -11,4 +11,24 @@ const verifyEmail = (input: string) => {
 }
 
 
-export { verifyEmail }
+const getCurrentTab = async () => {
+    let queryOptions = { active: true, currentWindow: true };
+    // `tab` will either be a `tabs.Tab` instance or `undefined`.
+    let [tab] = await chrome.tabs.query(queryOptions);
+    return tab;
+}
+
+
+const reloadTab = async () => {
+    chrome.tabs.reload()
+}
+
+
+const updateTab = (url: string) => {
+    chrome.tabs.update(
+        { url: url }
+    )
+}
+
+
+export { verifyEmail, getCurrentTab, reloadTab, updateTab }

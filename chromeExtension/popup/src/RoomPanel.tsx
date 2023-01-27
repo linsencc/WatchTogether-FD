@@ -3,6 +3,7 @@ import { Form, ButtonGroup, Button, Popover, Tag, Toast, Card, Tooltip } from '@
 import { IconHome, IconClose, IconYoutube, IconRefresh2, IconGithubLogo, IconTick, IconAt } from '@douyinfe/semi-icons';
 import { ValidateStatus } from '@douyinfe/semi-ui/lib/es/timePicker';
 import { createRoom, CreateRoomRes, joinRoom, leaveRoom, Room, signOut, User } from './api';
+import { getCurrentTab, reloadTab, updateTab } from './utils';
 
 
 interface RoomPanelArgs {
@@ -14,7 +15,6 @@ interface RoomPanelArgs {
 
 const RoomPanel = ({ initUser, initRoom, setUser }: RoomPanelArgs) => {
     const [room, setRoom] = useState<Room>();
-
     const [helpText, setHelpText] = useState<React.ReactNode>();
     const [validateStatus, setValidateStatus] = useState<ValidateStatus>('default');
     const formRef = useRef<Form<any>>(null);
@@ -60,9 +60,10 @@ const RoomPanel = ({ initUser, initRoom, setUser }: RoomPanelArgs) => {
             return;
         }
 
-        data = await createRoom(room);
+        data = await createRoom(room['roomNumber']);
         if (data.code === 0 && data.data !== undefined) {
             setRoom(data.data.room);
+            reloadTab();
         } else {
             console.log('userCreateOrJoinRoom', data);
             Toast.error({ content: data.msg, duration: 3 });
@@ -82,9 +83,10 @@ const RoomPanel = ({ initUser, initRoom, setUser }: RoomPanelArgs) => {
             return;
         }
 
-        data = await joinRoom(room);
+        data = await joinRoom(room['roomNumber']);
         if (data.code === 0 && data.data !== undefined) {
             setRoom(data.data.room);
+            updateTab(data.data.room?.room_url!);
         } else {
             console.error('userJoinRoom', data);
             Toast.error({ content: data.msg, duration: 3 });
@@ -93,15 +95,6 @@ const RoomPanel = ({ initUser, initRoom, setUser }: RoomPanelArgs) => {
 
     const userLeaveRoom = async () => {
         let roomNmuber = room === undefined ? '' : room.room_number;
-
-        // todo 改为表单验证
-        if (roomNmuber === undefined || roomNmuber === '') {
-            Toast.error({ content: '房间号不能为空', duration: 3 });
-            return;
-        } else if (roomNmuber.length !== 4) {
-            Toast.error({ content: '请输入4位数房间号', duration: 3 });
-            return;
-        }
 
         let data: CreateRoomRes = await leaveRoom(roomNmuber);
         if (data.code === 0 && data.data !== undefined) {
@@ -180,9 +173,7 @@ const RoomPanel = ({ initUser, initRoom, setUser }: RoomPanelArgs) => {
                             {room?.room_number}
                         </div>
 
-
                         <div style={{ marginLeft: 'auto', gap: '16px', display: 'flex' }}>
-
                             <Tooltip content={'回到播放页面（暂未实现）'} style={{ cursor: 'pointer' }}>
                                 <IconRefresh2 />
                             </Tooltip>
@@ -224,7 +215,6 @@ const RoomPanel = ({ initUser, initRoom, setUser }: RoomPanelArgs) => {
                     }>
                     <div style={{ display: 'flex', cursor: 'pointer' }}><IconTick />当前支持网站</div>
                 </Popover>
-
 
                 <div style={{ display: 'flex', gap: '2px', alignItems: 'center' }}><IconAt size='small' /> 2023/04/23</div>
             </div >

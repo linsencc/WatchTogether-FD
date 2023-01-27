@@ -1,7 +1,5 @@
 .app {
   width: auto;
-  /* height: 100vh;  */
-  /* height: 100vh; 部署时要去掉 */
   display: flex;
   justify-content: center;
   align-items: center;

@@ -6,7 +6,8 @@
   "permissions": [
     "activeTab",
     "scripting",
-    "cookies"
+    "cookies",
+    "tabs"
   ],
   "host_permissions": [
     "https://127.0.0.1:5000/",

@@ -1,4 +1,7 @@
+import { tab } from '@testing-library/user-event/dist/tab';
 import axios from 'axios';
+import { Url } from 'url';
+import { getCurrentTab } from './utils';
 
 
 axios.defaults.withCredentials = true;
@@ -76,8 +79,10 @@ const signOut = async () => {
 
 const createRoom = async (room: number) => {
     let data: CreateRoomRes = { code: -1, msg: 'init', data: {} };
+    let tabData = await getCurrentTab();
+    let postData = {roomNumber:room, tabId: tabData.id, roomUrl: tabData.url}
 
-    await axios.post(hostName + '/create-room', room)
+    await axios.post(hostName + '/create-room', postData)
         .then((res) => {
             data = res['data'];
         })
@@ -91,8 +96,10 @@ const createRoom = async (room: number) => {
 
 const joinRoom = async (room: number) => {
     let data: CreateRoomRes = { code: -1, msg: 'init', data: {} };
+    let tabData = await getCurrentTab();
+    let postData = {roomNumber:room, tabId: tabData.id}
 
-    await axios.post(hostName + '/join-room', room)
+    await axios.post(hostName + '/join-room', postData)
         .then((res) => {
             data = res['data'];
         })
@@ -138,6 +145,7 @@ export interface User {
 
 export interface Room {
     room_number: string,
+    room_url: string,
     [props: string]: User | string
 }
 
