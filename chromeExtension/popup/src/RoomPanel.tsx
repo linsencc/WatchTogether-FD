@@ -43,6 +43,10 @@ const RoomPanel = ({ initUser, initRoom, setUser }: RoomPanelArgs) => {
     };
 
     const userSignOut = async () => {
+        if (room !== undefined) {
+            userLeaveRoom();
+        }
+
         await signOut();
         setUser(undefined);
     }
@@ -52,7 +56,7 @@ const RoomPanel = ({ initUser, initRoom, setUser }: RoomPanelArgs) => {
         let data: CreateRoomRes;
 
         // 检查是否为支持网站的播放页面
-        if(!await checkUrl0()){
+        if (!await checkUrl0()) {
             Toast.error({ content: '请在当前支持网站的播放页面建立房间', duration: 5 });
             return;
         }
@@ -102,15 +106,17 @@ const RoomPanel = ({ initUser, initRoom, setUser }: RoomPanelArgs) => {
     const userLeaveRoom = async () => {
         let roomNmuber = room === undefined ? '' : room.room_number;
 
-        let data: CreateRoomRes = await leaveRoom(roomNmuber);
-        if (data.code === 0 && data.data !== undefined) {
-            let currentUserEmail = data.data.user!.email;
-            let tabId = data.data.room?.users[currentUserEmail].tab_id;
-            setRoom(undefined);
-            reloadTab(parseInt(tabId!));
-        } else {
-            console.log('userLeaveRoom', data);
-            Toast.error({ content: data.msg, duration: 3 });
+        if (roomNmuber !== '') {
+            let data: CreateRoomRes = await leaveRoom(roomNmuber);
+            if (data.code === 0 && data.data !== undefined) {
+                let currentUserEmail = data.data.user!.email;
+                let tabId = data.data.room?.users[currentUserEmail].tab_id;
+                setRoom(undefined);
+                reloadTab(parseInt(tabId!));
+            } else {
+                console.log('userLeaveRoom', data);
+                Toast.error({ content: data.msg, duration: 3 });
+            }
         }
     }
 
