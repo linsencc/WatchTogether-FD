@@ -1,11 +1,11 @@
 import React, { useEffect, useState } from 'react';
-import { Card, Tag, List, Skeleton, Button, Popover, Toast } from '@douyinfe/semi-ui';
+import { Card, Tag, List, Skeleton, Button, Typography } from '@douyinfe/semi-ui';
 import { IconBolt } from '@douyinfe/semi-icons';
 import Draggable from 'react-draggable';
 import io from 'socket.io-client';
 
 import { getCurrentTab, toHHMMSS } from './utils';
-import { getProfile, hostName } from './api';
+import { getProfile, hostname } from './api';
 
 
 const Content = () => {
@@ -74,14 +74,14 @@ const Content = () => {
                 if (currentTabIdBD === currentTabIdFD) {
                     console.log('set room, video, socket');
                     setRoom(data['room']['room_number']);
-                    setSocket(io(hostName + '/room', { withCredentials: true }));
+                    setSocket(io(hostname + '/room', { withCredentials: true }));
                     setVideo(document.getElementsByTagName('video')[0]);
                     setShowPanel(true);
                 }
             }
         }
         fetchProfileData();
-    }, []); 
+    }, []);
 
     useEffect(() => {
         if (video !== undefined && socket !== undefined && room !== undefined) {
@@ -138,7 +138,7 @@ const Content = () => {
     if (showPanel) {
         return (
             <Draggable>
-                <div style={{ position: 'fixed', bottom: '40px', right: ' 20px', zIndex: 9999 }}>
+                <div style={{ position: 'fixed', bottom: '40px', right: ' 20px', }}>
                     <Card
                         shadows='always'
                         style={{ width: 300, cursor: 'default' }}
@@ -176,8 +176,11 @@ const Content = () => {
 
 const RoomPanel = ({ socket }) => {
     const [users, setUsers] = useState(undefined);
+    const { Text } = Typography;
 
     useEffect(() => {
+        console.log('socket', socket);
+
         if (socket !== undefined) {
             socket.on('room-panel', ({ users }) => {
                 setUsers(users);
@@ -209,7 +212,9 @@ const RoomPanel = ({ socket }) => {
             return (
                 <div key={user} style={{ display: 'flex', gap: '8px' }}>
                     <IconBolt style={{ color: socketioColor }} />
-                    <div style={{ width: "50px" }}>{users[user].nickname}</div>
+                    <Text
+                        ellipsis={{ showTooltip: { opts: { content: users[user].nickname } } }}
+                        style={{ width: 56 }}>{users[user].nickname}</Text>
                     <Tag color='blue' type='solid'> {toHHMMSS(users[user].video_progress)} </Tag>
                     <Tag color={stateColor} type='solid'> {users[user].video_state} </Tag>
                 </div>

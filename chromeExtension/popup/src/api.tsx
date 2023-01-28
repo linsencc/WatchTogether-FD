@@ -3,13 +3,13 @@ import { getCurrentTab, getHostname } from './utils';
 
 
 axios.defaults.withCredentials = true;
-const hostName = getHostname();
+const hostname = getHostname();
 
 
 const getProfile = async () => {
     let user = {};
 
-    await axios.post(hostName + '/profile', {})
+    await axios.post(hostname + '/profile', {})
         .then((res) => {
             user = res.data.data;
         })
@@ -25,7 +25,7 @@ const signIn = async (arg: SignInSubmit) => {
     let signInRes: SignInRes = { code: -1, msg: '', data: { user: { 'nickname': '', email: '' } } }
     let postData = { account: arg['account'], password: arg['password'] };
 
-    await axios.post(hostName + '/sign-in', postData)
+    await axios.post(hostname + '/sign-in', postData)
         .then((res) => {
             signInRes = res.data;
             return signInRes;
@@ -43,7 +43,7 @@ const signUp = async (arg: SignInSubmit) => {
     let signInRes: SignInRes = { code: -1, msg: '', data: { user: { 'nickname': '', email: '' } } }
     let postData = { account: arg['account'], password: arg['password'], nickname: arg['nickname'] };
 
-    await axios.post(hostName + '/sign-up', postData)
+    await axios.post(hostname + '/sign-up', postData)
         .then((res) => {
             signInRes = res.data;
             return signInRes;
@@ -60,7 +60,7 @@ const signUp = async (arg: SignInSubmit) => {
 // 在部署到chrome extension时，由于在mainfest.json中申明了服务器IP权限，则不会出现该问题
 const signOut = async () => {
     let signInRes: SignInRes = { code: -1, msg: '', data: {} }
-    await axios.post(hostName + '/sign-out')
+    await axios.post(hostname + '/sign-out')
         .then((res) => {
             signInRes = res.data;
             return signInRes;
@@ -79,7 +79,7 @@ const createRoom = async (room: number) => {
     let tabData = await getCurrentTab();
     let postData = { roomNumber: room, tabId: tabData.id, roomUrl: tabData.url }
 
-    await axios.post(hostName + '/create-room', postData)
+    await axios.post(hostname + '/create-room', postData)
         .then((res) => {
             data = res['data'];
         })
@@ -96,7 +96,7 @@ const joinRoom = async (room: number) => {
     let tabData = await getCurrentTab();
     let postData = { roomNumber: room, tabId: tabData.id }
 
-    await axios.post(hostName + '/join-room', postData)
+    await axios.post(hostname + '/join-room', postData)
         .then((res) => {
             data = res['data'];
         })
@@ -111,7 +111,7 @@ const joinRoom = async (room: number) => {
 const leaveRoom = async (roomNumber: string) => {
     let data: CreateRoomRes = { code: -1, msg: 'init', data: {} };
 
-    await axios.post(hostName + '/leave-room', { roomNumber: roomNumber })
+    await axios.post(hostname + '/leave-room', { roomNumber: roomNumber })
         .then((res) => {
             data = res['data'];
         })
@@ -173,4 +173,4 @@ export interface SignInRes {
     }
 }
 
-export { hostName, getProfile, signIn, signUp, signOut, createRoom, joinRoom, leaveRoom }
+export { hostname, getProfile, signIn, signUp, signOut, createRoom, joinRoom, leaveRoom }

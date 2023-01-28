@@ -1,6 +1,5 @@
 node_modules/
-chromeExtension/content/src/js/babel/
-chromeExtension/content/src/js/build/
-chromeExtension/content/src/js/webpack/
-chromeExtension/popup/build/
+/chromeExtension/content/src/js/babel/
+/chromeExtension/content/src/js/webpack/
+/chromeExtension/popup/build/
 

@@ -27,8 +27,8 @@ const reloadTab = () => {
 
 
 const getHostname = () => {
-    let hostName = chrome.runtime.getManifest()['host_permissions'][0];
-    return hostName;
+    let hostname = chrome.runtime.getManifest()['host_permissions'][0];
+    return hostname.substring(0, hostname.length-1);
 }
 
 

@@ -3,12 +3,12 @@ import { getHostname } from './utils';
 
 
 axios.defaults.withCredentials = true;
-const hostName = getHostname();
+const hostname = getHostname();
 
 
 const getProfile = async () => {
     let user = {};
-    await axios.post(hostName + '/profile', {})
+    await axios.post(hostname + '/profile', {})
         .then((res) => {
             user = res.data.data;
         })
@@ -19,5 +19,5 @@ const getProfile = async () => {
 }
 
 
-export { hostName, getProfile}
+export { hostname, getProfile}
 

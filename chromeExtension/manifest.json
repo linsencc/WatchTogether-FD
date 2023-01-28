@@ -35,7 +35,7 @@
       "matches": [
         "https://www.bilibili.com/video/*",
         "https://www.bilibili.com/bangumi/play/*",
-        "https://www.youtube.com/watch?*",
+        "https://www.youtube.com/watch*",
         "https://www.iqiyi.com/*",
         "https://www.acfun.cn/v/*",
         "https://www.acfun.cn/bangumi/*",
