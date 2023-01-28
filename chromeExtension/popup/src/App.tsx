@@ -8,7 +8,6 @@ import RoomPanel from './RoomPanel';
 import SignIn from './SignIn';
 
 
-
 function App() {
     const [user, setUser] = useState<User>();
     const [room, setRoom] = useState<Room>();

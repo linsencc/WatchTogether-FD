@@ -1,12 +1,9 @@
-import { tab } from '@testing-library/user-event/dist/tab';
 import axios from 'axios';
-import { Url } from 'url';
-import { getCurrentTab } from './utils';
+import { getCurrentTab, getHostname } from './utils';
 
 
 axios.defaults.withCredentials = true;
-const hostName = 'https://119.91.150.116:5000';
-
+const hostName = getHostname();
 
 
 const getProfile = async () => {
@@ -80,7 +77,7 @@ const signOut = async () => {
 const createRoom = async (room: number) => {
     let data: CreateRoomRes = { code: -1, msg: 'init', data: {} };
     let tabData = await getCurrentTab();
-    let postData = {roomNumber:room, tabId: tabData.id, roomUrl: tabData.url}
+    let postData = { roomNumber: room, tabId: tabData.id, roomUrl: tabData.url }
 
     await axios.post(hostName + '/create-room', postData)
         .then((res) => {
@@ -97,7 +94,7 @@ const createRoom = async (room: number) => {
 const joinRoom = async (room: number) => {
     let data: CreateRoomRes = { code: -1, msg: 'init', data: {} };
     let tabData = await getCurrentTab();
-    let postData = {roomNumber:room, tabId: tabData.id}
+    let postData = { roomNumber: room, tabId: tabData.id }
 
     await axios.post(hostName + '/join-room', postData)
         .then((res) => {
@@ -130,6 +127,7 @@ export interface CreateRoomRes {
     msg: string,
     data: {
         room?: Room,
+        user?: User
     }
 }
 
@@ -139,6 +137,7 @@ export interface User {
     nickname: string,
     socketio?: string,
     url?: string,
+    tab_id?: string,
     video_progress?: string,
     video_state?: string
 }
@@ -146,7 +145,9 @@ export interface User {
 export interface Room {
     room_number: string,
     room_url: string,
-    [props: string]: User | string
+    users: {
+        [props: string]: User
+    }
 }
 
 export interface Profile {

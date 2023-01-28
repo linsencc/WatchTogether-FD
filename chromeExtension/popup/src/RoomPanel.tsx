@@ -1,9 +1,9 @@
 import React, { useEffect, useState, useRef } from 'react';
 import { Form, ButtonGroup, Button, Popover, Tag, Toast, Card, Tooltip } from '@douyinfe/semi-ui';
-import { IconHome, IconClose, IconYoutube, IconRefresh2, IconGithubLogo, IconTick, IconAt } from '@douyinfe/semi-icons';
+import { IconHome, IconClose, IconYoutube, IconUndo, IconGithubLogo, IconTick, IconAt } from '@douyinfe/semi-icons';
 import { ValidateStatus } from '@douyinfe/semi-ui/lib/es/timePicker';
 import { createRoom, CreateRoomRes, joinRoom, leaveRoom, Room, signOut, User } from './api';
-import { getCurrentTab, reloadTab, updateTab } from './utils';
+import { updateTab, reloadTab, checkUrl0 } from './utils';
 
 
 interface RoomPanelArgs {
@@ -51,7 +51,13 @@ const RoomPanel = ({ initUser, initRoom, setUser }: RoomPanelArgs) => {
         let room = formRef.current?.formApi.getValue();
         let data: CreateRoomRes;
 
-        // todo 改为表单验证
+        // 检查是否为支持网站的播放页面
+        if(!await checkUrl0()){
+            Toast.error({ content: '请在当前支持网站的播放页面建立房间', duration: 5 });
+            return;
+        }
+
+        // todo 改为表单验证房间号
         if (room['roomNumber'] === undefined || room['roomNumber'] === '') {
             Toast.error({ content: '房间号不能为空', duration: 3 });
             return;
@@ -65,7 +71,7 @@ const RoomPanel = ({ initUser, initRoom, setUser }: RoomPanelArgs) => {
             setRoom(data.data.room);
             reloadTab();
         } else {
-            console.log('userCreateOrJoinRoom', data);
+            console.log('userCreateRoom', data);
             Toast.error({ content: data.msg, duration: 3 });
         }
     }
@@ -88,7 +94,7 @@ const RoomPanel = ({ initUser, initRoom, setUser }: RoomPanelArgs) => {
             setRoom(data.data.room);
             updateTab(data.data.room?.room_url!);
         } else {
-            console.error('userJoinRoom', data);
+            console.log('userJoinRoom', data);
             Toast.error({ content: data.msg, duration: 3 });
         }
     }
@@ -98,9 +104,12 @@ const RoomPanel = ({ initUser, initRoom, setUser }: RoomPanelArgs) => {
 
         let data: CreateRoomRes = await leaveRoom(roomNmuber);
         if (data.code === 0 && data.data !== undefined) {
+            let currentUserEmail = data.data.user!.email;
+            let tabId = data.data.room?.users[currentUserEmail].tab_id;
             setRoom(undefined);
+            reloadTab(parseInt(tabId!));
         } else {
-            console.error('userLeaveRoom', data);
+            console.log('userLeaveRoom', data);
             Toast.error({ content: data.msg, duration: 3 });
         }
     }
@@ -153,7 +162,7 @@ const RoomPanel = ({ initUser, initRoom, setUser }: RoomPanelArgs) => {
                         <div onClick={random} style={{
                             color: 'var(--semi-color-link)', fontSize: 14,
                             userSelect: 'none', cursor: 'pointer',
-                            marginTop: '12px'
+                            marginTop: '12px', paddingLeft: '4px'
                         }} >
                             没想到合适房间号？点击随机生成一个
                         </div>
@@ -175,7 +184,7 @@ const RoomPanel = ({ initUser, initRoom, setUser }: RoomPanelArgs) => {
 
                         <div style={{ marginLeft: 'auto', gap: '16px', display: 'flex' }}>
                             <Tooltip content={'回到播放页面（暂未实现）'} style={{ cursor: 'pointer' }}>
-                                <IconRefresh2 />
+                                <IconUndo />
                             </Tooltip>
 
                             <Tooltip content={'退出房间'} style={{ cursor: 'pointer' }}>
@@ -194,7 +203,7 @@ const RoomPanel = ({ initUser, initRoom, setUser }: RoomPanelArgs) => {
                 alignItems: 'center',
                 gap: '8px',
                 color: 'rgb(0,0,0, 0.5)',
-                padding: '12px 0 0 8px',
+                padding: '14px 8px 4px 8px'
             }}>
                 <div
                     style={{ display: 'flex', cursor: 'pointer' }}

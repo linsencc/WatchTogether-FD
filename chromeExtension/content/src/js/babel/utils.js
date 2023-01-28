@@ -14,4 +14,18 @@ const toHHMMSS = val => {
   }
   return hours + ':' + minutes + ':' + seconds;
 };
-export { toHHMMSS };
+const getCurrentTab = async () => {
+  return await chrome.runtime.sendMessage({
+    text: "getCurrentTabId"
+  }).then(response => {
+    return 'response', response;
+  });
+};
+const reloadTab = () => {
+  chrome.tabs.reload();
+};
+const getHostname = () => {
+  let hostName = chrome.runtime.getManifest()['host_permissions'][0];
+  return hostName;
+};
+export { toHHMMSS, getCurrentTab, reloadTab, getHostname };

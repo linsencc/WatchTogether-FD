@@ -1,10 +1,6 @@
 
-
-// chrome.browserAction.onClicked.addListener(async (info, tab) => {
-//
-//   chrome.scripting.executeScript({
-//     // target: { tabId: tab.id },
-//     function: console.log("pop test"),
-//   });
-// });
-
+chrome.runtime.onMessage.addListener(function (msg, sender, sendResponse) {
+    if (msg.text == "getCurrentTabId") {
+        sendResponse({ tabId: sender.tab.id.toString() });
+    }
+});

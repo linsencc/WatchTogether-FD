@@ -1,4 +1,6 @@
 node_modules/
-build/
-babel/
-webpack/
+chromeExtension/content/src/js/babel/
+chromeExtension/content/src/js/build/
+chromeExtension/content/src/js/webpack/
+chromeExtension/popup/build/
+

@@ -18,9 +18,6 @@
 
 
 
-
-
-
 生成 Chrome Extension content.js
 1. 进入WatchTogether-FD/content目录下，命令行执行下面命令，使用babel监听文件夹，进行react转码；
 //  npx babel --watch src/js/original --out-dir src/js/babel --presets @babel/preset-react

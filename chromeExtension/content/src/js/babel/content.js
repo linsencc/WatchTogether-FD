@@ -1,10 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import { Card, Tag, List, Skeleton, Button, Popover, Toast } from '@douyinfe/semi-ui';
-import { IconRadio, IconBolt } from '@douyinfe/semi-icons';
+import { IconBolt } from '@douyinfe/semi-icons';
 import Draggable from 'react-draggable';
 import io from 'socket.io-client';
-import { CopyToClipboard } from 'react-copy-to-clipboard';
-import { toHHMMSS } from './utils';
+import { getCurrentTab, toHHMMSS } from './utils';
 import { getProfile, hostName } from './api';
 const Content = () => {
   const [socket, setSocket] = useState(undefined);
@@ -77,14 +76,23 @@ const Content = () => {
     console.log('loading content');
     const fetchProfileData = async () => {
       let data = await getProfile();
+
+      // 用户登录并且在房间内
       if (data['user'] !== undefined && data['room'] !== undefined) {
-        console.log('set room, video, socket');
-        setRoom(data['room']['room_number']);
-        setSocket(io(hostName + '/room', {
-          withCredentials: true
-        }));
-        setVideo(document.getElementsByTagName('video')[0]);
-        setShowPanel(true);
+        let currentUserEmail = data['user']['email'];
+        let currentTabIdBD = data['room']['users'][currentUserEmail]['tab_id'];
+        let currentTabIdFD = (await getCurrentTab())['tabId'];
+
+        // 当前的tab与建立或加入房间时tab相匹配
+        if (currentTabIdBD === currentTabIdFD) {
+          console.log('set room, video, socket');
+          setRoom(data['room']['room_number']);
+          setSocket(io(hostName + '/room', {
+            withCredentials: true
+          }));
+          setVideo(document.getElementsByTagName('video')[0]);
+          setShowPanel(true);
+        }
       }
     };
     fetchProfileData();
@@ -166,7 +174,7 @@ const Content = () => {
         paddingBottom: '6px',
         fontSize: '16px'
       }
-    }, room !== undefined ? /*#__PURE__*/React.createElement("div", null, "\u623F\u95F4\u53F7 :", room) : /*#__PURE__*/React.createElement(Skeleton.Paragraph, {
+    }, room !== undefined ? /*#__PURE__*/React.createElement("div", null, "\u623F\u95F4\u53F7: ", room) : /*#__PURE__*/React.createElement(Skeleton.Paragraph, {
       style: {
         width: 60
       },

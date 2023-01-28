@@ -1,11 +1,9 @@
 import { Button, Form, Toast } from '@douyinfe/semi-ui';
 import { useState } from 'react';
-
-import './App.css';
 import { signIn, signUp } from './api';
 import { SignInSubmit, SignInArgs, SignInRes } from './api'
 import { verifyEmail } from './utils';
-
+import './App.css';
 
 
 const SignIn = ({ setUser }: SignInArgs) => {
@@ -32,9 +30,9 @@ const SignIn = ({ setUser }: SignInArgs) => {
     }
     return (
         <div>
-            <div style={{ marginBottom: "4px" }}>
-                <Button onClick={() => { setType('sign-in') }} size='large' style={{ marginRight: '12px', fontSize: '16px', background: 'white' }}> 用户登录</Button>
-                <Button onClick={() => { setType('sign-up') }} size='large' style={{ marginRight: '12px', fontSize: '16px', background: 'white' }}> 用户注册</Button>
+            <div style={{ marginBottom: "0px" }}>
+                <Button onClick={() => { setType('sign-in') }} size='default' style={{ marginRight: '12px', fontSize: '16px', background: 'white' }}> 用户登录</Button>
+                <Button onClick={() => { setType('sign-up') }} size='default' style={{ marginRight: '12px', fontSize: '16px', background: 'white' }}> 用户注册</Button>
             </div>
 
             <Form onSubmit={values => handlerSubmit(values)}>
@@ -59,7 +57,7 @@ const SignIn = ({ setUser }: SignInArgs) => {
                         style={{ width: 200 }} />
                 ) : null}
 
-                <div style={{ marginTop: '4px' }}>
+                <div style={{ marginTop: '4px', marginBottom: '12px' }}>
                     <Button type="primary" htmlType="submit" block>
                         {type === 'sign-in' ? '登录' : '注册'}
                     </Button>

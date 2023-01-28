@@ -19,16 +19,44 @@ const getCurrentTab = async () => {
 }
 
 
-const reloadTab = async () => {
-    chrome.tabs.reload()
-}
-
-
 const updateTab = (url: string) => {
-    chrome.tabs.update(
-        { url: url }
-    )
+    chrome.tabs.update({ url: url });
 }
 
 
-export { verifyEmail, getCurrentTab, reloadTab, updateTab }
+const reloadTab = async (tabId?: number) => {
+    if (tabId === undefined) {
+        chrome.tabs.reload();
+    } else {
+        try {
+            await chrome.tabs.reload(tabId);
+        } catch (error) {
+            console.log(error);
+        }
+    }
+}
+
+
+const checkUrl0 = async () => {
+    let tabData = await getCurrentTab();
+    let currentUrl = tabData.url!;
+
+    let contentScripts = chrome.runtime.getManifest()['content_scripts'];
+    let matchesUrl = contentScripts![0]['matches']!;
+
+    for(let i=0; i<matchesUrl.length; i++){
+        if(new RegExp(matchesUrl[0]).test(currentUrl)){
+            return true;
+        }
+    }
+    return false;
+}
+
+
+const getHostname = () => {
+    let hostName = chrome.runtime.getManifest()['host_permissions'][0];
+    return hostName;
+}
+
+
+export { verifyEmail, getCurrentTab, updateTab, reloadTab, checkUrl0, getHostname }

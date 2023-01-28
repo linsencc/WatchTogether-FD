@@ -10,9 +10,11 @@
     "tabs"
   ],
   "host_permissions": [
-    "https://127.0.0.1:5000/",
     "https://119.91.150.116:5000/"
   ],
+  "background": {
+    "service_worker": "background.js"
+  },
   "action": {
     "default_popup": "popup/Build/index.html",
     "default_icon": {
@@ -31,11 +33,13 @@
   "content_scripts": [
     {
       "matches": [
-        "https://*.bilibili.com/*",
-        "https://*.youtube.com/*",
-        "https://*.iqiyi.com/*",
-        "https://*.acfun.cn/*",
-        "https://*.youku.com/*"
+        "https://www.bilibili.com/video/*",
+        "https://www.bilibili.com/bangumi/play/*",
+        "https://www.youtube.com/watch?*",
+        "https://www.iqiyi.com/*",
+        "https://www.acfun.cn/v/*",
+        "https://www.acfun.cn/bangumi/*",
+        "https://v.youku.com/v_show/*"
       ],
       "js": [
         "content/src/js/webpack/index.js"
