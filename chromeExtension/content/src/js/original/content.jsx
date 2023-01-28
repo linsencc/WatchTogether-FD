@@ -14,6 +14,7 @@ const Content = () => {
     const [room, setRoom] = useState(undefined);
     const [showPanel, setShowPanel] = useState(false);
     const [isConnected, setIsConnected] = useState(false);
+    const { Text } = Typography;
 
     let syncEventId = undefined;
 
@@ -149,7 +150,7 @@ const Content = () => {
                         }}>
                         <div style={{ display: 'flex', justifyContent: 'flex-start', gap: '8px', paddingBottom: '6px', fontSize: '16px' }}>
                             {room !== undefined ?
-                                <div>房间号: {room}</div> :
+                                <Text copyable={{ content: room }}>房间号: {room} </Text> :
                                 <Skeleton.Paragraph style={{ width: 60 }} rows={1} />
                             }
                         </div>
