@@ -13,67 +13,60 @@ const Content = () => {
     const [video, setVideo] = useState(undefined);
     const [room, setRoom] = useState(undefined);
     const [showPanel, setShowPanel] = useState(false);
-    const [isConnected, setIsConnected] = useState(false);
+
     const { Text } = Typography;
+    let onSync = false;
 
-    let syncEventId = undefined;
-
-    const videoPauseEventListener = () => {
+    function videoPauseEvent(e) {
         console.log("this video on pause", video.currentTime);
-        socket.emit('update-user-info', { currentState: 'pause', currentProgress: video.currentTime });
+        socket.emit('updateUserInfo', { currentState: 'pause', currentProgress: video.currentTime });
     }
-    const videoPlayingEventListener = () => {
+    const videoPlayingEvent = () => {
         console.log("this video on playing", video.currentTime);
-        socket.emit('update-user-info', { currentState: 'playing', currentProgress: video.currentTime });
+        socket.emit('updateUserInfo', { currentState: 'playing', currentProgress: video.currentTime });
     }
-    const videoSeekedEventListener = () => {
+    const videoSeekedEvent = () => {
         console.log("this video on seeked", video.currentTime);
-        socket.emit('update-user-info', { currentState: 'seeked', currentProgress: video.currentTime });
+        socket.emit('updateUserInfo', { currentState: 'seeked', currentProgress: video.currentTime });
     }
-    const videoWaitingEventListener = () => {
+    const videoWaitingEvent = () => {
         console.log("this video on waiting", video.currentTime);
-        socket.emit('update-user-info', { currentState: 'waiting', currentProgress: video.currentTime });
+        socket.emit('updateUserInfo', { currentState: 'waiting', currentProgress: video.currentTime });
     }
-    const videoCanplaythroughEventListener = () => {
-        // 防止出现循环调用
-        if (syncEventId !== undefined) {
-            socket.emit('sync-event', { 'action': 'update sync state', 'state': 1, 'syncEventId': syncEventId });
+    const videoCanplaythroughEvent = () => {
+        if (onSync) {
+            socket.emit('sync', { 'action': 'updateState', 'state': 1 });
+            onSync = false;  // socketVideoPause中标识一个sync事件开始
         }
     }
-    const setVideoListener = () => {
-        // video.addEventListener('play', videoPlayEventListener);
-        video.addEventListener('pause', videoPauseEventListener);
-        video.addEventListener('playing', videoPlayingEventListener);
-        video.addEventListener('seeked', videoSeekedEventListener);
-        video.addEventListener('waiting', videoWaitingEventListener);
-        video.addEventListener('canplaythrough', videoCanplaythroughEventListener);
+    const socketVideoPause = (data) => {
+        onSync = true;
+        video.pause();
+        video.currentTime = data['time'];
     }
-    const removeVideoListener = () => {
-        // video.removeEventListener('play', videoPlayEventListener);
-        video.removeEventListener('pause', videoPauseEventListener);
-        video.removeEventListener('playing', videoPlayingEventListener);
-        video.removeEventListener('seeked', videoSeekedEventListener);
-        video.removeEventListener('waiting', videoWaitingEventListener);
-        video.removeEventListener('canplaythrough', videoCanplaythroughEventListener);
+    const socketVideoPlay = (data) => {
+        video.play();
     }
-    const setNewSyncEvent = () => {
-        socket.emit('sync-event', { 'action': 'init new sync state', 'time': video.currentTime });
+    const launchSync = () => {
+        socket.emit('sync', { 'action': 'init', 'time': video.currentTime });
+    }
+    const lanuchPause = () => {
+        socket.emit('sync', { 'action': 'pause', 'time': video.currentTime });
     }
 
     useEffect(() => {
-        console.log('loading content');
-        const fetchProfileData = async () => {
+        const initData = async () => {
+            console.log('[WT] init room, video, socket');
             let data = await getProfile();
 
-            // 用户登录并且在房间内
+            // 检测用户登录、房间状态
             if (data['user'] !== undefined && data['room'] !== undefined) {
                 let currentUserEmail = data['user']['email'];
                 let currentTabIdBD = data['room']['users'][currentUserEmail]['tab_id'];
                 let currentTabIdFD = (await getCurrentTab())['tabId'];
 
-                // 当前的tab与建立或加入房间时tab相匹配
+                // 检测当前tab与建立或加入房间时tab是否相匹配
                 if (currentTabIdBD === currentTabIdFD) {
-                    console.log('set room, video, socket');
                     setRoom(data['room']['room_number']);
                     setSocket(io(hostname + '/room', { withCredentials: true }));
                     setVideo(document.getElementsByTagName('video')[0]);
@@ -81,97 +74,82 @@ const Content = () => {
                 }
             }
         }
-        fetchProfileData();
+        initData();
     }, []);
 
     useEffect(() => {
         if (video !== undefined && socket !== undefined && room !== undefined) {
-            console.log('set listener on');
-
             socket.on('connect', () => {
-                setVideoListener();
-                setIsConnected(true);
-                console.log('socket connect');
+                video.addEventListener('pause', videoPauseEvent);
+                video.addEventListener('playing', videoPlayingEvent);
+                video.addEventListener('seeked', videoSeekedEvent);
+                video.addEventListener('waiting', videoWaitingEvent);
+                video.addEventListener('canplaythrough', videoCanplaythroughEvent);
+                observer.observe(video, { 'attributeFilter': ['src', 'duration'] });
             });
 
-            socket.on('disconnect', () => {
-                setIsConnected(false);
-                console.log('socket disconnect');
-            });
-
-            socket.on('video-action', (data) => {
-                const action = data['action'];
-                switch (action) {
-                    case 'play':
-                        video.play();
-                        syncEventId = undefined;
-                        break;
-                    case 'pause-and-jump':
-                        video.pause();
-                        video.currentTime = data['time'];
-                        syncEventId = data['sync-event-id'];
-                        break;
-                    default:
-                        console.log('mistake action');
+            socket.on('videoAction', (data) => {
+                if (data['action'] === 'play') {
+                    socketVideoPlay(data);
+                } else if (data['action'] === 'pause') {
+                    socketVideoPause(data);
+                } else if (data['action'] === 'updateUrl') {
+                    window.location.replace(data['url']);
                 }
             });
 
+            // 使用MutationObserver监听video.src变化，实现用户视频切换同步
+            var observer = new MutationObserver((records) => {
+                if (video.src !== '' && video.src !== undefined) {
+                    socket.emit('sync', { 'action': 'updateUrl', 'url': window.location.href });
+                }
+            });
+            // 定时更新用户信息
             const intervalUpdateState = setInterval(() => {
-                socket.emit('update-user-info', { currentProgress: video.currentTime });
+                socket.emit('updateUserInfo', { currentProgress: video.currentTime });
             }, 200);
 
-
-            // 初始化视频播放状态，避免出现在socket建立时视频已经开始播放，video init不更新情况
+            // 初始化视频播放状态，避免出现在socket建立时视频已经开始播放，状态显示'init'不更新情况
             const videoInitState = video.paused ? 'pause' : 'playing';
-            socket.emit('update-user-info', { currentState: videoInitState, currentProgress: video.currentTime });
+            socket.emit('updateUserInfo', { currentState: videoInitState, currentProgress: video.currentTime });
 
             return () => {
-                removeVideoListener();
+                video.removeEventListener('pause', videoPauseEvent);
+                video.removeEventListener('playing', videoPlayingEvent);
+                video.removeEventListener('seeked', videoSeekedEvent);
+                video.removeEventListener('waiting', videoWaitingEvent);
+                video.removeEventListener('canplaythrough', videoCanplaythroughEvent);
+                observer.disconnect();
+                socket.close();
                 clearInterval(intervalUpdateState);
-                socket.off('connect');
-                socket.off('disconnect');
-                socket.off('video-action');
-                console.log('set listener off');
             }
         }
     }, [socket, video, room]);
 
-    if (showPanel) {
-        return (
-            <Draggable>
-                <div style={{ position: 'fixed', bottom: '40px', right: ' 20px', }}>
-                    <Card
-                        shadows='always'
-                        style={{ width: 300, cursor: 'default' }}
-                        bodyStyle={{
-                            display: 'flex',
-                            justifyContent: 'flex-start',
-                            flexDirection: 'column'
-                        }}>
-                        <div style={{ display: 'flex', justifyContent: 'flex-start', gap: '8px', paddingBottom: '6px', fontSize: '16px' }}>
-                            {room !== undefined ?
-                                <Text copyable={{ content: room }}>房间号: {room} </Text> :
-                                <Skeleton.Paragraph style={{ width: 60 }} rows={1} />
-                            }
-                        </div>
-
-                        <RoomPanel socket={socket}></RoomPanel>
-
-                        <div style={{ width: 'auto', marginTop: '12px' }}>
-                            <Button
-                                theme='solid'
-                                onClick={setNewSyncEvent}
-                                block>
-                                同步进度
-                            </Button>
-                        </div>
-                    </Card>
-                </div>
-            </Draggable>
-        )
-    } else {
+    if (showPanel === false) {
         return null;
     }
+
+    return (
+        <Draggable>
+            <div style={{ position: 'fixed', bottom: '40px', right: ' 20px', zIndex: 1000 }}>
+                <Card shadows='always' style={{ width: 300, cursor: 'default' }}
+                    bodyStyle={{ display: 'flex', justifyContent: 'flex-start', flexDirection: 'column' }}>
+
+                    <div style={{ display: 'flex', justifyContent: 'flex-start', gap: '8px', paddingBottom: '6px', fontSize: '16px' }}>
+                        {room !== undefined
+                            ? <Text copyable={{ content: room }}>房间号: {room} </Text>
+                            : <Skeleton.Paragraph style={{ width: 60 }} rows={1} />}
+                    </div>
+                    <RoomPanel socket={socket}></RoomPanel>
+
+                    <div style={{ width: 'auto', marginTop: '12px' }}>
+                        <Button theme='solid' onClick={launchSync} block> 同步进度  </Button>
+                    </div>
+                </Card>
+            </div>
+        </Draggable>
+    )
 }
 
 
@@ -180,8 +158,6 @@ const RoomPanel = ({ socket }) => {
     const { Text } = Typography;
 
     useEffect(() => {
-        console.log('socket', socket);
-
         if (socket !== undefined) {
             socket.on('room-panel', ({ users }) => {
                 setUsers(users);

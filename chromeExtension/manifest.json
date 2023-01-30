@@ -10,7 +10,7 @@
     "tabs"
   ],
   "host_permissions": [
-    "https://119.91.150.116:5000/"
+    "https://127.0.0.1:5000/"
   ],
   "background": {
     "service_worker": "background.js"
