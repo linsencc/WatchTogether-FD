@@ -13,7 +13,6 @@ const verifyEmail = (input: string) => {
 
 const getCurrentTab = async () => {
     let queryOptions = { active: true, currentWindow: true };
-    // `tab` will either be a `tabs.Tab` instance or `undefined`.
     let [tab] = await chrome.tabs.query(queryOptions);
     return tab;
 }
@@ -44,8 +43,8 @@ const checkUrl0 = async () => {
     let contentScripts = chrome.runtime.getManifest()['content_scripts'];
     let matchesUrl = contentScripts![0]['matches']!;
 
-    for(let i=0; i<matchesUrl.length; i++){
-        if(new RegExp(matchesUrl[i]).test(currentUrl)){
+    for (let i = 0; i < matchesUrl.length; i++) {
+        if (new RegExp(matchesUrl[i]).test(currentUrl)) {
             return true;
         }
     }
@@ -55,7 +54,7 @@ const checkUrl0 = async () => {
 
 const getHostname = () => {
     let hostname = chrome.runtime.getManifest()['host_permissions'][0];
-    return hostname.substring(0, hostname.length-1);
+    return hostname.substring(0, hostname.length - 1);
 }
 
 

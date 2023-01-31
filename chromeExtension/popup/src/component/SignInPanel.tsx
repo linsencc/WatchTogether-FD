@@ -1,33 +1,22 @@
 import { Button, Form, Toast } from '@douyinfe/semi-ui';
 import { useState } from 'react';
-import { signIn, signUp } from './api';
-import { SignInSubmit, SignInArgs, SignInRes } from './api'
-import { verifyEmail } from './utils';
-import './App.css';
+import { signIn, signUp } from '../api';
+import { SignInSubmit, SignInArgs, SignInRes } from '../api'
+import { verifyEmail } from '../utils';
 
 
 const SignIn = ({ setUser }: SignInArgs) => {
     const [type, setType] = useState<string>('sign-in');
 
     const handlerSubmit = async (values: SignInSubmit) => {
-        if (type === 'sign-in') {
-            let signInRes: SignInRes = await signIn(values);
-            if (signInRes.code === 0 && signInRes.data.user !== undefined) {
-                setUser(signInRes.data.user);
-            } else {
-                console.log('signInRes', signInRes)
-                Toast.error({ content: signInRes.msg, duration: 3 });
-            }
-        }
-        if (type === 'sign-up') {
-            let signInRes: SignInRes = await signUp(values);
-            if (signInRes.code === 0 && signInRes.data.user !== undefined) {
-                setUser(signInRes.data.user);
-            } else {
-                Toast.error({ content: signInRes.msg, duration: 3 });
-            }
+        let signInRes: SignInRes = (type === 'sign-in') ? await signIn(values) : await signUp(values);;
+        if (signInRes.code === 0 && signInRes.data.user !== undefined) {
+            setUser(signInRes.data.user);
+        } else {
+            Toast.error({ content: signInRes.msg, duration: 3 });
         }
     }
+
     return (
         <div>
             <div style={{ marginBottom: "0px" }}>

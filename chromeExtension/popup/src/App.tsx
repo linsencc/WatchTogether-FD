@@ -1,11 +1,11 @@
-import { Button, Skeleton, Form, Toast } from '@douyinfe/semi-ui';
+import { Skeleton, Typography } from '@douyinfe/semi-ui';
 import { useEffect, useState } from 'react';
 
 import './App.css';
 import { getProfile } from './api';
 import { User, Room, Profile, SignInSubmit, SignInArgs, SignInRes } from './api'
 import RoomPanel from './RoomPanel';
-import SignIn from './SignIn';
+import SignIn from './component/SignInPanel';
 
 
 function App() {

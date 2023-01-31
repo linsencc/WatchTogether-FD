@@ -3,7 +3,9 @@ import { getCurrentTab, getHostname } from './utils';
 
 
 axios.defaults.withCredentials = true;
-const hostname = getHostname();
+const hostname = 'https://127.0.0.1:5000';
+
+// const hostname = getHostname();
 
 
 const getProfile = async () => {
