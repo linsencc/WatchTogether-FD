@@ -21,15 +21,10 @@ const getCurrentTab = async () => {
 }
 
 
-const reloadTab = () => {
-    chrome.tabs.reload();
-}
-
-
 const getHostname = () => {
     let hostname = chrome.runtime.getManifest()['host_permissions'][0];
     return hostname.substring(0, hostname.length-1);
 }
 
 
-export { toHHMMSS, getCurrentTab, reloadTab, getHostname }
+export { toHHMMSS, getCurrentTab, getHostname }

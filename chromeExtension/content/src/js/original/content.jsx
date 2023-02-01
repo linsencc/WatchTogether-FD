@@ -57,6 +57,7 @@ const Content = () => {
         const initData = async () => {
             console.log('[WT] init room, video, socket');
             let data = await getProfile();
+            console.log('[WT] profile', data);
 
             // 检测用户登录、房间状态
             if (data['user'] !== undefined && data['room'] !== undefined) {
@@ -107,7 +108,7 @@ const Content = () => {
             // 定时更新用户信息
             const intervalUpdateState = setInterval(() => {
                 socket.emit('updateUserInfo', { currentProgress: video.currentTime });
-            }, 200);
+            }, 100);
 
             // 初始化视频播放状态，避免出现在socket建立时视频已经开始播放，状态显示'init'不更新情况
             const videoInitState = video.paused ? 'pause' : 'playing';

@@ -1,5 +1,5 @@
 import { Toast, Card, Tooltip, Typography } from '@douyinfe/semi-ui';
-import { IconClose, IconUndo } from '@douyinfe/semi-icons';
+import { IconClose } from '@douyinfe/semi-icons';
 import { leaveRoom, Room } from '../api';
 
 
@@ -18,8 +18,12 @@ const InRoom = ({ room, setRoom }: InRoomArgs) => {
 
         if (leaveRoomRes.code === 0 && leaveRoomRes.data !== undefined) {
             setRoom(undefined);
-            let tabId = leaveRoomRes.data.user!.tab_id!;
-            chrome.tabs.update(Number(tabId), { url: leaveRoomRes.data.room?.room_url! });
+            try{
+                let tabId = leaveRoomRes.data.user!.tab_id!;
+                chrome.tabs.update(Number(tabId), { url: leaveRoomRes.data.room?.room_url! });
+            }catch{
+                console.log('tab id not found');
+            }
         } else {
             Toast.error({ content: leaveRoomRes.msg, duration: 3 });
         }
@@ -39,10 +43,6 @@ const InRoom = ({ room, setRoom }: InRoomArgs) => {
                 <Text copyable={{ content: room?.room_number }} > </Text>
 
                 <div style={{ marginLeft: 'auto', gap: '16px', display: 'flex' }}>
-                    <Tooltip content={'回到播放页面（暂未实现）'} style={{ cursor: 'pointer' }}>
-                        <IconUndo />
-                    </Tooltip>
-
                     <Tooltip content={'退出房间'} style={{ cursor: 'pointer' }}>
                         <IconClose onClick={userLeaveRoom} />
                     </Tooltip>

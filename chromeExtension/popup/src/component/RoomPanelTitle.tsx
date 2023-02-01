@@ -18,7 +18,6 @@ const Title = ({ user, setUser, room, setRoom }: RoomPanelTitleArgs) => {
         display: 'flex',
         alignItems: 'center',
         gap: '4px',
-        paddingLeft: '8px',
         fontWeight: '600'
     }
 
@@ -48,13 +47,13 @@ const Title = ({ user, setUser, room, setRoom }: RoomPanelTitleArgs) => {
         if (room !== undefined) {
             userLeaveRoom();
         }
-        if ((await signOut()).code == 0) {
+        if ((await signOut()).code === 0) {
             setUser(undefined);
         }
     }
 
     return (
-        <div style={{ display: 'flex' }}>
+        <div style={{ display: 'flex', margin: '0 8px' }}>
             <div style={logoCss}>
                 <IconYoutube /> WatchTogether
             </div>
