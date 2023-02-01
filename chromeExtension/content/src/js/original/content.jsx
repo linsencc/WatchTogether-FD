@@ -1,11 +1,10 @@
 import React, { useEffect, useState } from 'react';
-import { Card, Tag, List, Skeleton, Button, Typography } from '@douyinfe/semi-ui';
-import { IconBolt } from '@douyinfe/semi-icons';
+import { Card, Skeleton, Button, Typography } from '@douyinfe/semi-ui';
 import Draggable from 'react-draggable';
 import io from 'socket.io-client';
-
-import { getCurrentTab, toHHMMSS } from './utils';
+import { getCurrentTab } from './utils';
 import { getProfile, hostname } from './api';
+import RoomPanel from './RoomPanel'
 
 
 const Content = () => {
@@ -85,7 +84,8 @@ const Content = () => {
                 video.addEventListener('seeked', videoSeekedEvent);
                 video.addEventListener('waiting', videoWaitingEvent);
                 video.addEventListener('canplaythrough', videoCanplaythroughEvent);
-                observer.observe(video, { 'attributeFilter': ['src', 'duration'] });
+                observer.observe(video, { 'attributeFilter': ['src'] });
+                launchSync();
             });
 
             socket.on('videoAction', (data) => {
@@ -136,9 +136,12 @@ const Content = () => {
                 <Card shadows='always' style={{ width: 300, cursor: 'default' }}
                     bodyStyle={{ display: 'flex', justifyContent: 'flex-start', flexDirection: 'column' }}>
 
-                    <div style={{ display: 'flex', justifyContent: 'flex-start', gap: '8px', paddingBottom: '6px', fontSize: '16px' }}>
+                    <div style={{ display: 'flex', justifyContent: 'flex-start', gap: '8px', paddingBottom: '6px' }}>
                         {room !== undefined
-                            ? <Text copyable={{ content: room }}>房间号: {room} </Text>
+                            ? <div>
+                                <div style={{ fontSize: '16px', display: 'inline' }}>房间号: {room}</div>
+                                <Text copyable={{ content: room }}> </Text>
+                            </div>
                             : <Skeleton.Paragraph style={{ width: 60 }} rows={1} />}
                     </div>
                     <RoomPanel socket={socket}></RoomPanel>
@@ -150,67 +153,6 @@ const Content = () => {
             </div>
         </Draggable>
     )
-}
-
-
-const RoomPanel = ({ socket }) => {
-    const [users, setUsers] = useState(undefined);
-    const { Text } = Typography;
-
-    useEffect(() => {
-        if (socket !== undefined) {
-            socket.on('room-panel', ({ users }) => {
-                setUsers(users);
-            });
-            return () => {
-                socket.off('room-panel');
-            }
-        }
-    }, [socket])
-
-    const stateToColor = (state) => {
-        if (state == 'playing' || state == 'play') return 'green';
-        if (state == 'pause') return 'orange';
-        if (state == 'waiting' || state == 'init') return 'white';
-        if (state == 'close') return 'red';
-        return 'red';
-    }
-
-    const socketioToColor = (socketio) => {
-        if (socketio == true) return "#505050";
-        else return "#f4f4f4";
-    }
-
-    const userToList = () => {
-        return Object.keys(users).map((user) => {
-            const stateColor = stateToColor(users[user].video_state);
-            const socketioColor = socketioToColor(users[user].socketio);
-
-            return (
-                <div key={user} style={{ display: 'flex', gap: '8px' }}>
-                    <IconBolt style={{ color: socketioColor }} />
-                    <Text
-                        ellipsis={{ showTooltip: { opts: { content: users[user].nickname } } }}
-                        style={{ width: 56 }}>{users[user].nickname}</Text>
-                    <Tag color='blue' type='solid'> {toHHMMSS(users[user].video_progress)} </Tag>
-                    <Tag color={stateColor} type='solid'> {users[user].video_state} </Tag>
-                </div>
-            );
-        });
-    }
-
-    if (users === undefined) {
-        return (
-            <Skeleton.Paragraph style={{ width: 240 }} rows={3} />
-        )
-    } else {
-        return (
-            <List
-                dataSource={userToList()}
-                renderItem={item => <List.Item style={{ padding: "12px 24px 4px 0px" }}>{item}</List.Item>}
-            />
-        )
-    }
 }
 
 
