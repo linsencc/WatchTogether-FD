@@ -1,8 +1,8 @@
 import { Form, ButtonGroup, Button, Toast } from '@douyinfe/semi-ui';
 import { useState, useRef } from 'react';
 import { ValidateStatus } from '@douyinfe/semi-ui/lib/es/timePicker';
-import { createRoom, CreateRoomRes, joinRoom, Room } from '../api';
-import { updateTab, checkUrl0 } from '../utils';
+import { createRoom, joinRoom, Room } from '../api';
+import { checkUrl } from '../utils';
 
 
 interface JoinRoomArgs {
@@ -36,7 +36,7 @@ const JoinRoom = ({ setRoom }: JoinRoomArgs) => {
     };
 
     const userCreateRoom = async () => {
-        if (!await checkUrl0()) {
+        if (!await checkUrl()) {
             Toast.error({ content: '请在当前支持网站的播放页面建立房间', duration: 5 });
             return;
         }
@@ -47,7 +47,7 @@ const JoinRoom = ({ setRoom }: JoinRoomArgs) => {
 
             if (createRoomRes.code === 0 && createRoomRes.data !== undefined && createRoomRes.data.room !== undefined) {
                 setRoom(createRoomRes.data.room);
-                updateTab(createRoomRes.data.room?.room_url!);
+                chrome.tabs.update({ url: createRoomRes.data.room?.room_url! });
             } else {
                 Toast.error({ content: createRoomRes.msg, duration: 3 });
             }
@@ -61,7 +61,8 @@ const JoinRoom = ({ setRoom }: JoinRoomArgs) => {
 
             if (createRoomRes.code === 0 && createRoomRes.data !== undefined && createRoomRes.data.room !== undefined) {
                 setRoom(createRoomRes.data.room);
-                updateTab(createRoomRes.data.room?.room_url!);
+                let tabId = createRoomRes.data.user?.tab_id!;
+                chrome.tabs.update(Number(tabId), { url: createRoomRes.data.room?.room_url! });
             } else {
                 Toast.error({ content: createRoomRes.msg, duration: 3 });
             }

@@ -9,7 +9,7 @@ const hostname = 'https://127.0.0.1:5000';
 
 
 const getProfile = async () => {
-    let user = {};
+    let user: Profile = {};
 
     await axios.post(hostname + '/profile', {})
         .then((res) => {
@@ -133,6 +133,11 @@ export interface CreateRoomRes {
     }
 }
 
+export interface Profile {
+    user?: User,
+    room?: Room
+}
+
 
 export interface User {
     email: string,
@@ -150,11 +155,6 @@ export interface Room {
     users: {
         [props: string]: User
     }
-}
-
-export interface Profile {
-    user?: User,
-    room?: Room
 }
 
 export interface SignInArgs {
