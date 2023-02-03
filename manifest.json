@@ -1,0 +1,49 @@
+{
+  "name": "WatchTogether",
+  "description": "异地看片小助手，允许多个PC设备同步视频播放进度",
+  "version": "1.0",
+  "manifest_version": 3,
+  "permissions": [
+    "tabs"
+  ],
+  "background": {
+    "service_worker": "WatchTogether/build/static/js/background/background.bundle.js"
+  },
+  "host_permissions": [
+    "https://119.91.150.116:5000/"
+  ],
+  "action": {
+    "default_popup": "WatchTogether/build/popup.html",
+    "default_icon": {
+      "16": "WatchTogether/public/images/live-16.png",
+      "32": "WatchTogether/public/images/live-32.png",
+      "48": "WatchTogether/public/images/live-48.png",
+      "128": "WatchTogether/public/images/live-128.png"
+    }
+  },
+  "icons": {
+    "16": "WatchTogether/public/images/live-16.png",
+    "32": "WatchTogether/public/images/live-32.png",
+    "48": "WatchTogether/public/images/live-48.png",
+    "128": "WatchTogether/public/images/live-128.png"
+  },
+  "content_scripts": [
+    {
+      "matches": [
+        "https://www.bilibili.com/video/*",
+        "https://www.bilibili.com/bangumi/play/*",
+        "https://www.youtube.com/watch*",
+        "https://www.iqiyi.com/*",
+        "https://www.acfun.cn/v/*",
+        "https://www.acfun.cn/bangumi/*",
+        "https://v.youku.com/v_show/*"
+      ],
+      "js": [
+        "WatchTogether/build/static/js/content/content.bundle.js"
+      ],
+      "css": [
+        "WatchTogether/build/static/css/content/content.css"
+      ]
+    }
+  ]
+}
