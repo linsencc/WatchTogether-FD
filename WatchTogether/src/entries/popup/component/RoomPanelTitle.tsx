@@ -1,17 +1,14 @@
 import { IconYoutube } from '@douyinfe/semi-icons';
-import { Toast } from '@douyinfe/semi-ui';
-import { Room, User, signOut, leaveRoom } from '../../../api';
+import { User } from '../../../api';
 
 
 interface RoomPanelTitleArgs {
     user: User,
-    room: Room | undefined,
-    setUser: (user: User | undefined) => void,
-    setRoom: (room: Room | undefined) => void
+    userSignOut: () => {}
 }
 
 
-const Title = ({ user, setUser, room, setRoom }: RoomPanelTitleArgs) => {
+const Title = ({ user, userSignOut }: RoomPanelTitleArgs) => {
     const logoCss = {
         color: 'rgb(0 0 0 / 65%)',
         fontSize: '16px',
@@ -28,33 +25,6 @@ const Title = ({ user, setUser, room, setRoom }: RoomPanelTitleArgs) => {
         alignItems: 'end',
         gap: '8px',
         fontSize: '12px'
-    }
-
-    const userLeaveRoom = async () => {
-        let roomNmuber = room!.room_number;
-        let leaveRoomRes = await leaveRoom(roomNmuber);
-
-        if (leaveRoomRes.code === 0 && leaveRoomRes.data !== undefined) {
-            setRoom(undefined);
-
-            try {
-                let tabId = leaveRoomRes.data.user!.tab_id;
-                await chrome.tabs.update(parseInt(tabId!), { url: leaveRoomRes.data.room?.room_url! });
-            } catch (error) {
-                console.log('tab id not found', error);
-            }
-        } else {
-            Toast.error({ content: leaveRoomRes.msg, duration: 3 });
-        }
-    }
-
-    const userSignOut = async () => {
-        if (room !== undefined) {
-            userLeaveRoom();
-        }
-        if ((await signOut()).code === 0) {
-            setUser(undefined);
-        }
     }
 
     return (

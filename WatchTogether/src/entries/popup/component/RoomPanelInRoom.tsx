@@ -5,37 +5,18 @@ import { leaveRoom, Room } from '../../../api';
 
 interface InRoomArgs {
     room: Room,
-    setRoom: (room: Room | undefined) => void
+    userLeaveRoom: () => void
 }
 
 
-const InRoom = ({ room, setRoom }: InRoomArgs) => {
+const InRoom = ({ room, userLeaveRoom }: InRoomArgs) => {
     const { Text } = Typography;
-
-    const userLeaveRoom = async () => {
-        let roomNmuber = room.room_number;
-        let leaveRoomRes = await leaveRoom(roomNmuber);
-
-        if (leaveRoomRes.code === 0 && leaveRoomRes.data !== undefined) {
-            setRoom(undefined);
-            try{
-                let tabId = leaveRoomRes.data.user!.tab_id!;
-                await chrome.tabs.update(Number(tabId), { url: leaveRoomRes.data.room?.room_url! });
-            }catch(error) {
-                console.log('tab id not found', error);
-            }
-        } else {
-            Toast.error({ content: leaveRoomRes.msg, duration: 3 });
-        }
-    }
 
     return (
         <div>
             <Card
-                shadows='always'
                 style={{ maxWidth: 360, alignItems: 'center', margin: '12px 0 0 0', cursor: 'auto' }}
-                bodyStyle={{ display: 'flex', alignItems: 'center', gap: '8px' }}
-            >
+                shadows='always' bodyStyle={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
 
                 <div style={{ fontWeight: '500', fontSize: '17px', color: 'rgb(0,0,0, 0.55)' }}>
                     {room?.room_number}

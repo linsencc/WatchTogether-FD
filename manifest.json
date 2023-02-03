@@ -4,7 +4,9 @@
   "version": "1.0",
   "manifest_version": 3,
   "permissions": [
-    "tabs"
+    "tabs",
+    "storage",
+    "notifications"
   ],
   "background": {
     "service_worker": "WatchTogether/build/static/js/background/background.bundle.js"

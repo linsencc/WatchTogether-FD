@@ -116,6 +116,7 @@ const createRoom = async (room: number) => {
 
     await axios.post(hostname + '/create-room', postData).then((res) => {
         data = res['data'];
+        chrome.storage.local.set({ room: { tabId: tabData.id, roomNumber: room } });
     }).catch((res) => {
         console.log(res);
     })
@@ -130,6 +131,7 @@ const joinRoom = async (room: number) => {
 
     await axios.post(hostname + '/join-room', postData).then((res) => {
         data = res['data'];
+        chrome.storage.local.set({ room: { tabId: tabData.id, roomNumber: room } });
     }).catch((res) => {
         console.log(res);
     })
@@ -142,6 +144,7 @@ const leaveRoom = async (roomNumber: string) => {
 
     await axios.post(hostname + '/leave-room', { roomNumber: roomNumber }).then((res) => {
         data = res['data'];
+        chrome.storage.local.remove('room');
     }).catch((res) => {
         console.log(res);
     })
@@ -149,4 +152,18 @@ const leaveRoom = async (roomNumber: string) => {
 }
 
 
-export { hostname, getProfile, signIn, signUp, signOut, createRoom, joinRoom, leaveRoom }
+const leaveRoomFetch = async (roomNumber: string) => {
+    const options = {
+        method: "POST",
+        headers: { 'Content-Type': 'application/json', credentials: 'include' },
+        body: JSON.stringify({ roomNumber: roomNumber }),
+    };
+
+    let response = await fetch(hostname + '/leave-room', options);
+    let data: CreateRoomRes = await response.json();
+    chrome.storage.local.remove('room');
+    return data;
+}
+
+
+export { hostname, getProfile, signIn, signUp, signOut, createRoom, joinRoom, leaveRoom, leaveRoomFetch }
