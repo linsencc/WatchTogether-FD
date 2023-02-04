@@ -23,6 +23,7 @@ export interface Users {
 export interface Room {
     room_number: string,
     room_url: string,
+    video_identify: string,
     users: {
         [props: string]: User
     }

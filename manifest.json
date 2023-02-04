@@ -12,7 +12,7 @@
     "service_worker": "WatchTogether/build/static/js/background/background.bundle.js"
   },
   "host_permissions": [
-    "https://119.91.150.116:5000/"
+    "https://127.0.0.1:5000/"
   ],
   "action": {
     "default_popup": "WatchTogether/build/popup.html",

@@ -3,7 +3,7 @@ import { Card, Skeleton, Button, Typography } from '@douyinfe/semi-ui';
 import Draggable from 'react-draggable';
 import io, { Socket } from 'socket.io-client';
 import { getCurrentTabIdByBackground } from '../../utils';
-import { getProfile, hostname, Profile } from '../../api';
+import { getProfile, hostname, Profile, Room } from '../../api';
 import UsersPanel from './component/UsersPanel'
 
 
@@ -18,7 +18,7 @@ interface VideoActionArgs {
 const Content = () => {
     const [socket, setSocket] = useState<Socket>();
     const [video, setVideo] = useState<HTMLVideoElement>();
-    const [room, setRoom] = useState<string>();
+    const [room, setRoom] = useState<Room>();
     const [showPanel, setShowPanel] = useState<boolean>(false);
 
     const { Text } = Typography;
@@ -26,19 +26,19 @@ const Content = () => {
 
     function videoPauseEvent(e: Event) {
         console.log("this video on pause", video!.currentTime);
-        socket!.emit('updateUserInfo', { currentState: 'pause', currentProgress: video!.currentTime });
+        socket!.emit('updateInfo', { currentState: 'pause', currentProgress: video!.currentTime });
     }
     const videoPlayingEvent = () => {
         console.log("this video on playing", video!.currentTime);
-        socket!.emit('updateUserInfo', { currentState: 'playing', currentProgress: video!.currentTime });
+        socket!.emit('updateInfo', { currentState: 'playing', currentProgress: video!.currentTime });
     }
     const videoSeekedEvent = () => {
         console.log("this video on seeked", video!.currentTime);
-        socket!.emit('updateUserInfo', { currentState: 'seeked', currentProgress: video!.currentTime });
+        socket!.emit('updateInfo', { currentState: 'seeked', currentProgress: video!.currentTime });
     }
     const videoWaitingEvent = () => {
         console.log("this video on waiting", video!.currentTime);
-        socket!.emit('updateUserInfo', { currentState: 'waiting', currentProgress: video!.currentTime });
+        socket!.emit('updateInfo', { currentState: 'waiting', currentProgress: video!.currentTime });
     }
     const videoCanplaythroughEvent = () => {
         if (onSync) {
@@ -71,11 +71,10 @@ const Content = () => {
             if (data['user'] !== undefined && data['room'] !== undefined) {
                 let currentTabIdBD = data['user']['tab_id'];
                 let currentTabIdFD = await getCurrentTabIdByBackground();
-                console.log('currentTabIdFD', currentTabIdFD);
 
                 // 检测当前tab与建立或加入房间时tab是否相匹配
                 if (currentTabIdBD === currentTabIdFD) {
-                    setRoom(data.room.room_number);
+                    setRoom(data.room);
                     setSocket(io(hostname + '/room', { withCredentials: true }));
                     setVideo(document.getElementsByTagName('video')[0]);
                     setShowPanel(true);
@@ -107,20 +106,30 @@ const Content = () => {
                 }
             });
 
+            // 通过地址栏输入url打开新页面时同步
+            const currentVideoIdentify = document.title + video.duration.toString();
+            if (room.video_identify === '') {
+                socket.emit('updateInfo', { videoIdentify: currentVideoIdentify });
+            } else if (room.video_identify !== currentVideoIdentify) {
+                socket.emit('updateInfo', { videoIdentify: currentVideoIdentify });
+                socket.emit('sync', { 'action': 'updateUrl', 'url': window.location.href });
+            }
+
             // 使用MutationObserver监听video.src变化，实现用户视频切换同步
             var observer = new MutationObserver((records) => {
                 if (video.src !== '' && video.src !== undefined) {
+                    socket.emit('updateInfo', { videoIdentify: currentVideoIdentify });
                     socket.emit('sync', { 'action': 'updateUrl', 'url': window.location.href });
                 }
             });
             // 定时更新用户信息
             const intervalUpdateState = setInterval(() => {
-                socket.emit('updateUserInfo', { currentProgress: video.currentTime });
+                socket.emit('updateInfo', { currentProgress: video.currentTime });
             }, 100);
 
             // 初始化视频播放状态，避免出现在socket建立时视频已经开始播放，状态显示'init'不更新情况
             const videoInitState = video.paused ? 'pause' : 'playing';
-            socket.emit('updateUserInfo', { currentState: videoInitState, currentProgress: video.currentTime });
+            socket.emit('updateInfo', { currentState: videoInitState, currentProgress: video.currentTime });
 
             return () => {
                 video.removeEventListener('pause', videoPauseEvent);
@@ -148,8 +157,8 @@ const Content = () => {
                     <div style={{ display: 'flex', justifyContent: 'flex-start', gap: '8px', paddingBottom: '6px' }}>
                         {room !== undefined
                             ? <div>
-                                <div style={{ fontSize: '16px', display: 'inline' }}>房间号: {room}</div>
-                                <Text copyable={{ content: room }}> </Text>
+                                <div style={{ fontSize: '16px', display: 'inline' }}>房间号: {room.room_number}</div>
+                                <Text copyable={{ content: room.room_number }}> </Text>
                             </div>
                             : <Skeleton.Paragraph style={{ width: 60 }} rows={1} />}
                     </div>
