@@ -1,6 +1,6 @@
 import { Toast, Card, Tooltip, Typography } from '@douyinfe/semi-ui';
 import { IconClose } from '@douyinfe/semi-icons';
-import { leaveRoom, Room } from '../../../api';
+import { Room } from '../../../api';
 
 
 interface InRoomArgs {

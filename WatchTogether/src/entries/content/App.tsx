@@ -93,7 +93,10 @@ const Content = () => {
                 video.addEventListener('waiting', videoWaitingEvent);
                 video.addEventListener('canplaythrough', videoCanplaythroughEvent);
                 observer.observe(video, { 'attributeFilter': ['src'] });
-                launchSync();
+
+                if (Object.keys(room.users).length > 1) {
+                    launchSync();
+                }
             });
 
             socket.on('videoAction', (data: VideoActionArgs) => {
