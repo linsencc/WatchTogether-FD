@@ -18,6 +18,15 @@ const getCurrentTab = async () => {
 }
 
 
+const getRoomTab = async () => {
+    let data = await chrome.storage.local.get('room');
+    if (data.room !== undefined) {
+        return chrome.tabs.get(data.room.tabId);
+    }
+    return undefined
+}
+
+
 const checkUrl = async () => {
     let tabData = await getCurrentTab();
     let currentUrl = tabData.url!;
@@ -49,18 +58,17 @@ const toHHMMSS = (val: string) => {
 
 const getCurrentTabIdByBackground = async () => {
     return (
-        await chrome.runtime.sendMessage({ text: "getCurrentTabId" })
-            .then((response) => {
-                return (response.tabId);
-            })
+        await chrome.runtime.sendMessage({ text: "getCurrentTabId" }).then((response) => {
+            return (response.tabId);
+        })
     )
 }
 
 const getHostname = () => {
     let hostname = chrome.runtime.getManifest()['host_permissions'][0];
-    return hostname.substring(0, hostname.length-1);
+    return hostname.substring(0, hostname.length - 1);
 }
 
 
 
-export { verifyEmail, getCurrentTab, checkUrl, getHostname, toHHMMSS, getCurrentTabIdByBackground }
+export { verifyEmail, getCurrentTab, getRoomTab, checkUrl, getHostname, toHHMMSS, getCurrentTabIdByBackground }
