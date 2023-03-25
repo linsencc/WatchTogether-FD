@@ -1,7 +1,7 @@
 {
   "name": "WatchTogether",
   "description": "异地看片小助手，允许多个PC设备同步视频播放进度",
-  "version": "1.0",
+  "version": "1.1",
   "manifest_version": 3,
   "permissions": [
     "tabs",
@@ -12,7 +12,7 @@
     "service_worker": "WatchTogether/build/static/js/background/background.bundle.js"
   },
   "host_permissions": [
-    "https://127.0.0.1:5000/"
+    "https://119.91.150.116:5000/"
   ],
   "action": {
     "default_popup": "WatchTogether/build/popup.html",
